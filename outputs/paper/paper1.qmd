@@ -1,5 +1,5 @@
 ---
-title: "Does denser population area has more crime than others?"
+title: "Which area in Toronto has the most crime? The relationship between crime and area's population."
 author: "Thu Dong"
 format: pdf
 editor: visual
@@ -26,6 +26,8 @@ library(here)
 
 ```{r}
 #| include: false
+
+# Read clean data csv file
 neighborhood_crime_clean <-
   read_csv(
     here("/cloud/project/outputs/data/neighborhood_crime_2023_clean.csv"),
@@ -35,7 +37,27 @@ neighborhood_crime_clean <-
 
 ## Table of Content
 
-## 1. Introduction
+### 1. Introduction.
+
+### 2. Data.
+
+#### 2.1. Crime volume in 2023.
+
+#### 2.2 Population in 2023.
+
+### 3. Result.
+
+#### 3.1 **Toronto Area and the population in 2023.**
+
+#### 3.2. **Toronto Area and crime volume.**
+
+### 4. Discussions
+
+### 5. Conclusion 
+
+### References
+
+## 1. Introduction 
 
 Toronto is considered one of the safest cities in Canada and North America with homicide rates of approximately 1.95 per 100,000 people in 2020 (Armstrong and Jaffray 2021). However, it was reported that there was a 14% increase in the overall crime rate in 2022 and it will continue to increase in 2023 (Rosenbaum 2023). It is believed that more populated areas tend to have higher crime incidents. This paper attempts to investigate whether areas with higher populations experience higher levels of crime occurrences.  
 
@@ -45,7 +67,7 @@ To discuss the relationship between population density and crime volume, this pa
 
 ## 2. Data
 
-The data used in this paper was obtained through the City of Toronto's OpenDataToronto Library. The data set is called 'Neighborhood Crime Rate' ("Open Data Dataset" 2024). Data was collected and analyzed using the statistical programming software R[@citeR] (R Core Team 2023 ), with additional support from tidyverse[\@wickham](Wickham%20et%20al.%202019), ggplot2 [@book] (Wickham 2016), dplyr [\@wh](Wickham%20et%20al.%202023), readr [@readr]\[(Wickham, Hester, and Bryan 2023), here[@here] (Müller K 2020), knitr [@knitr] ( Yihui Xie 2014), kableExtra [@kableE] ( Zhu H 2021), psych [@psych] ( William Revelle 2024).
+The data used in this paper was obtained through the City of Toronto's OpenDataToronto Library. The data set is called 'Neighborhood Crime Rate' ("Open Data Dataset" 2024). Data was collected and analyzed using the statistical programming software R[@citeR] (R Core Team 2023 ), with additional support from tidyverse [@wickham], ggplot2 [@book] (Wickham 2016), dplyr [@wh], readr [@readr]\[(Wickham, Hester, and Bryan 2023), here[@here] (Müller K 2020), knitr [@knitr] ( Yihui Xie 2014), kableExtra [@kableE] ( Zhu H 2021), psych [@psych] ( William Revelle 2024).
 
 ### **2.1.Crime volume in 2023.**
 
@@ -55,14 +77,19 @@ To get the data for crime volume in 2023, I selected 8 columns: Assaults, Auto T
 
 ### **2.2. Population in 2023.**
 
-Data for area in Toronto and population in 2023 was available in the " Neighborhood Crime rate" dataset. Therefore, the name of the area and the population in 2023 were added to the clean data set. shows the first 5 rows of the data set with area name, population, and the number of crime occurrences i
+Data for area in Toronto and population in 2023 was available in the " Neighborhood Crime rate" dataset. Therefore, the name of the area and the population in 2023 were added to the clean data set. Table 1 shows the first 5 rows of the data set with area name, population, and the number of crime occurrences.
 
 ```{r}
 #| echo: false
+#| fig-pos: H
+
+# create main table for analysis
 neighborhood_crime <- select(neighborhood_crime_clean, AREA_NAME, POPULATION_2023, TOTAL_CRIME_2023)
 
+#store in csv file
 write_csv(neighborhood_crime, "neighborhood_crime_analysis.csv")
 
+# display table 
 kable(head(neighborhood_crime,5), 
       col.names = c("Area in Toronto", "population in 2023", "total crime cases in 2023"),
       caption = " Sample of data with crime cases and population in Toronto areas in 2023  ") %>%
@@ -78,6 +105,7 @@ There are 158 areas divided in Toronto. Out of the 158 areas in Toronto,  Beech
 
 ```{r}
 #| echo: false
+#| fig-pos: H
 #Summary table
 summary_result <- describe(neighborhood_crime$POPULATION_2023)
 #summary_result
@@ -85,11 +113,12 @@ summary_result <- describe(neighborhood_crime$POPULATION_2023)
 #area with lowest population
 min_populated_area <- neighborhood_crime$AREA_NAME[which.min(neighborhood_crime$POPULATION_2023)]
 
+# arranged the data in terms of population from max to mean and get first 10
 sorted_population_table <- neighborhood_crime_clean %>%
   arrange(desc(POPULATION_2023)) %>%
   slice_head(n = 10)
 
-
+# show a summary table of population and the area name accordingly
 sorted_population_table |>
   summarise(population = POPULATION_2023,
             .by = AREA_NAME) |>
@@ -104,13 +133,14 @@ Table 3 shows 10 areas with the highest level of criminal incidents in Toronto. 
 
 ```{r}
 #| echo: false
+#| fig-pos: H
 # 10 neighborhood with the most crime
-
+# organize data set from highest to lowest total crime
 sorted_table <- neighborhood_crime_clean %>%
   arrange(desc(TOTAL_CRIME_2023)) %>%
   slice_head(n = 10)
 
-
+# summary table 
 sorted_table |>
   summarise(total_crime = TOTAL_CRIME_2023,
             .by = AREA_NAME) |>
@@ -124,6 +154,9 @@ Table 4 illustrates which area in Toronto has the highest crime occurrence of a 
 
 ```{r}
 #| echo: false
+#| fig-pos: H
+
+# find which area that has the highest crime cases of a particular crime
 area <- neighborhood_crime_clean$AREA_NAME
 max_assault <- which.max(neighborhood_crime_clean$ASSAULT_2023)
 max_auto_theft <- which.max(neighborhood_crime_clean$AUTOTHEFT_2023)
@@ -136,6 +169,7 @@ max_theft_mv <- which.max(neighborhood_crime_clean$THEFTFROMMV_2023)
 max_theft_over <- which.max(neighborhood_crime_clean$THEFTOVER_2023)
 
 
+# table show what area has the most in a particular crime 
 type_of_crime <- data.frame(
   Type_of_Crime= c("Assault",  "Auto Theft", "Bike Theft", "Breaking and Entering","Robbery", "Homicide", "Shooting", "Theft from moving vehicles", "Theft Over"), 
   Area_with_max = c(area[max_assault], area[max_auto_theft], area[max_bike_theft], area[max_break_enter], area[max_homicide], area[max_shooting], area[max_robbery], area[max_theft_mv], area[max_theft_over]))
@@ -152,7 +186,7 @@ Overall, the data reveals that there is a clear relationship between the number 
 
 ```{r}
 #| echo: false
-#scatterplot
+#scatterplot of population in areas and total number of crime 
 ggplot(neighborhood_crime_clean, aes(x = POPULATION_2023, y = TOTAL_CRIME_2023)) +
    geom_point() + 
   labs(title = "Correlation between crime and population density", x = "Population in 2023", y = "number of cases in 2023") +
@@ -172,3 +206,5 @@ There are some limitations regarding the validity of this analysis. Firstly, Som
 ## 5. Conclusion.
 
 This paper investigates which area in Toronto has a higher population and which has more crime as well as the relationship between crime level and the area's population. The outcome revealed that there is a positive relationship between the number of crime cases and the population in a particular area. This is a correlation research so there is no conclusion on the causal inferences of the two variables. Going onwards, this research will establish the causal inference on whether the increase in population leads to the increase in crime by including some other omitted variables such as income, quality of life, etc. 
+
+## Reference
