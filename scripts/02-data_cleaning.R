@@ -14,12 +14,7 @@ clean_data <- select(raw_data,AREA_NAME,POPULATION_2023,ASSAULT_2023,
                      AUTOTHEFT_2023,BIKETHEFT_2023,BREAKENTER_2023,
                      HOMICIDE_2023,ROBBERY_2023,SHOOTING_2023,THEFTFROMMV_2023,
                      THEFTOVER_2023)
-clean_data %>% 
-  dplyr::ungroup() %>% 
-  dplyr::select(AREA_NAME,POPULATION_2023,ASSAULT_2023,
-                AUTOTHEFT_2023,BIKETHEFT_2023,BREAKENTER_2023,
-                HOMICIDE_2023,ROBBERY_2023,SHOOTING_2023,THEFTFROMMV_2023,
-                THEFTOVER_2023)            
+          
 # replace NA with 0
 clean_data[is.na(clean_data)] <- 0
 
